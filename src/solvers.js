@@ -15,9 +15,35 @@
 
 
 
-window.findNRooksSolution = function(n) {
-  var solution = undefined; //fixme
 
+/*
+tree.value = a board with certain values on it
+tree.children = [board with value + 1 more]
+
+1. create an empty board
+  How To - var myBoard = new Board(n)
+2. create a potential child board
+3. if child board has no conflicts, and counter of num rooks added does not equal n
+  a. create a potential child board
+  b. if this child board has no conflicts
+  ...
+  keep going until we reach n rooks
+
+*/
+window.findNRooksSolution = function(n) {
+  var solution = new Board({n: n}); //fixme - update as a closure when valid board AND vaild N's
+  var numOfRooks = 0;
+  var innerFunc = function(solution) {
+    var matrix = solution.rows();
+    if (numOfRooks !== n) {
+      // recursively call inner func to CHANGE solution
+    }
+    for (var i = 0; i < matrix.length; i++) {
+      for (var j = 0; j < matrix.length; j++) {
+        // if (solution.hasAnyRooksConflicts())
+      }
+    }
+  };
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };

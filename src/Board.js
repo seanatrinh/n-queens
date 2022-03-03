@@ -152,59 +152,44 @@
     // we need to get the first ROW and COLUMN index to know where to look
     // do we need to use _getFirstRowColumnIndexForMajorDiagonalOn?
     // do we pass in another parameter to this function?
-    hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow) {
-      let rows = this.rows();
-      let diagonalStart = _getFirstRowColumnIndexForMajorDiagonalOn(0, majorDiagonalColumnIndexAtFirstRow);
-      let counter = 0;
+    hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow, row) {
+      row = row || 0;
+      var diagNum = this._getFirstRowColumnIndexForMajorDiagonalOn(row, majorDiagonalColumnIndexAtFirstRow);
+      var rows = this.rows();
+      var diagSet = new Set();
+
       for (let i = 0; i < rows.length; i++) {
-        if (rows[i][i + majorDiagonalColumnIndexAtFirstRow] === 1) {
-          counter++;
-        }
-        if (counter > 1) {
-          return true;
+        for (let j = 0; j < rows[i].length; j++) {
+          if (rows[i][j] === 1 && diagNum === this._getFirstRowColumnIndexForMajorDiagonalOn(i, j)) {
+            if (diagSet.size) {
+              return true;
+            }
+            diagSet.add(diagNum);
+          }
         }
       }
-      return false; // fixme
+      return false;
     },
 
     // test if any major diagonals on this board contain conflicts
     // we need to check EVERY row/col combo where row is 0 or col is 0
 
     hasAnyMajorDiagonalConflicts: function() {
-      // let rows = this.rows();
-      // this one iterates over cols?
-      // should cols one check the middle? How do we not check the middle again?
-      // for (let i = 0; i < rows.length; i++) {
-      //   if (this.hasMajorDiagonalConflictAt(i)) {
-      //     return true;
-      //   }
-      // }
-
-      // TO DO: add hasMajorDiagonalConflictAt as a function in this function's scope, so we can see if our recursive logic works
-
-      let conflictPresent = false;
-      let innerFunc = function(rows) {
-        for (var j = 0; j < rows.length; j++) {
-          if (rows.hasMajorDiagonalConflictAt(j)) {
-            conflictPresent = true;
-          } else {
-            innerFunc(rows.slice(1));
-          }
+      var rows = this.rows();
+      // column loop
+      for (let i = 0; i < rows.length; i++) {
+        if (this.hasMajorDiagonalConflictAt(i)) {
+          return true;
         }
-      };
+      }
+      // row loop
+      for (let j = 1; j < rows.length; j++) {
+        if (this.hasMajorDiagonalConflictAt(0, j)) {
+          return true;
+        }
+      }
+      return false;
 
-
-      innerFunc(this.rows());
-      return conflictPresent;
-      // another one to iterate over rows? We have to increment which row its looking at though??
-      // I have no idea :('
-      // do we start this at one because the top function checked the top half?
-      // for (var j = 0; j < rows.length; j++) {
-      //   if (this.hasMajorDiagonalConflictAt(j)) {
-      //     return true;
-      //   }
-      // }
-      // return false; // fixme
     },
 
 
@@ -213,23 +198,41 @@
     // --------------------------------------------------------------
     //
     // test if a specific minor diagonal on this board contains a conflict
-    hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow) {
-      let rows = this.rows();
-      let counter = 0;
+    hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow, row) {
+      row = row || 0;
+      var diagNum = this._getFirstRowColumnIndexForMinorDiagonalOn(row, minorDiagonalColumnIndexAtFirstRow);
+      var rows = this.rows();
+      var diagSet = new Set();
+
       for (let i = 0; i < rows.length; i++) {
-        if (rows[i][minorDiagonalColumnIndexAtFirstRow - i] === 1) {
-          counter++;
-        }
-        if (counter > 1) {
-          return true;
+        for (let j = 0; j < rows[i].length; j++) {
+          if (rows[i][j] === 1 && diagNum === this._getFirstRowColumnIndexForMinorDiagonalOn(i, j)) {
+            if (diagSet.size) {
+              return true;
+            }
+            diagSet.add(diagNum);
+          }
         }
       }
-      return false; // fixme
+      return false;
     },
 
     // test if any minor diagonals on this board contain conflicts
     hasAnyMinorDiagonalConflicts: function() {
-      return false; // fixme
+      var rows = this.rows();
+      // column loop
+      for (let i = 0; i < rows.length; i++) {
+        if (this.hasMinorDiagonalConflictAt(i)) {
+          return true;
+        }
+      }
+      // row loop
+      for (let j = 1; j < rows.length; j++) {
+        if (this.hasMinorDiagonalConflictAt(rows.length - 1, j)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     /*--------------------  End of Helper Functions  ---------------------*/
