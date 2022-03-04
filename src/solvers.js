@@ -31,43 +31,175 @@ tree.children = [board with value + 1 more]
 
 */
 window.findNRooksSolution = function(n) {
-  var solution = new Board({n: n}); //fixme - update as a closure when valid board AND vaild N's
-  var numOfRooks = 0;
-  var innerFunc = function(solution) {
-    var matrix = solution.rows();
-    if (numOfRooks !== n) {
-      // recursively call inner func to CHANGE solution
-    }
-    for (var i = 0; i < matrix.length; i++) {
-      for (var j = 0; j < matrix.length; j++) {
-        // if (solution.hasAnyRooksConflicts())
+  let solution = new Board({n: n});
+  let rookCount = 0;
+  let innerFunc = function(solution) {
+    let rows = solution.rows();
+    if (rookCount === n && !solution.hasAnyRooksConflicts()) {
+      return solution;
+    } else {
+      let rowToAddTo = 0;
+      for (let i = 0; i < rows.length; i++) {
+        if (!rows[i].includes(1)) {
+          rowToAddTo = i;
+          break;
+        }
+      }
+      for (let j = 0; j < rows.length; j++) {
+        solution.togglePiece(rowToAddTo, j);
+        if (!solution.hasAnyRooksConflicts()) {
+          rookCount++;
+          return innerFunc(solution);
+        }
+        solution.togglePiece(rowToAddTo, j);
       }
     }
   };
+  innerFunc(solution);
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  return solution;
+  return solution.rows();
 };
 
+/*
+create counter
+instantiate a board
+create inner function with row passed in (default 0)
+  create alias for rows
+  *** BASE CASE ***
+  if row is equal to n
+    increase counter
+    return - brings us out of EC
+  *** RECURSIVE CASE ***
+  iterate over rows
+    toggle piece at row and i
+    if board is legal
+      call inner function with row + 1 passed in
+    untoggle piece
+  call inner function
+  return counter
+*/
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
-
+  var solutionCount = 0;
+  var board = new Board({n: n});
+  var innerFunc = function(row = 0) {
+    if (row === n) {
+      solutionCount++;
+      return;
+    }
+    for (var i = 0; i < board.rows().length; i++) {
+      board.togglePiece(row, i);
+      if (!board.hasAnyRooksConflicts()) {
+        innerFunc(row + 1);
+      }
+      board.togglePiece(row, i);
+    }
+  };
+  innerFunc();
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
-
+  let board = new Board({n: n});
+  let solution;
+  if (n === 2 || n === 3) {
+    return board.rows();
+  }
+  if (n === 0) {
+    return board.rows();
+  }
+  var innerFunc = function(row = 0) {
+    // create break case
+    if (row === n) {
+      solution = board.rows();
+      return;
+    }
+    for (let j = 0; j < board.rows().length; j++) {
+      board.togglePiece(row, j);
+      if (!board.hasAnyQueensConflicts()) {
+        innerFunc(row + 1);
+      }
+      if (solution !== undefined) {
+        break;
+      }
+      board.togglePiece(row, j);
+    }
+  };
+  // debugger;
+  innerFunc();
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
+/*
+create counter
+instantiate a board
+create inner function with row passed in (default 0)
+  create alias for rows
+  *** BASE CASE ***
+  if row is equal to n
+    increase counter
+    return - brings us out of EC
+  *** RECURSIVE CASE ***
+  iterate over rows
+    toggle piece at row and i
+    if board is legal
+      call inner function with row + 1 passed in
+    untoggle piece
+  call inner function
+  return counter
+*/
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var solutionCount = 0;
+  var board = new Board ({n: n});
 
+  var innerFunc = function(row = 0) {
+    if (row === n) {
+      solutionCount++;
+      return;
+    }
+
+    for (let i = 0; i < board.rows().length; i++) {
+      board.togglePiece(row, i);
+      if (!board.hasAnyQueensConflicts()) {
+        innerFunc(row + 1);
+      }
+      board.togglePiece(row, i);
+    }
+  };
+  innerFunc();
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
+
+
+// let innerFunc = function(solution, rowToAddTo = 0) {
+
+//   let rows = solution.rows();
+//   if (queenCount === n && !solution.hasAnyQueensConflicts()) {
+//     console.log(`Queen Count: ${queenCount}`);
+//     return solution;
+//   } else {
+//     // let rowToAddTo = ro0;
+//     // for (let i = 0; i < rows.length; i++) {
+//     //   if (!rows[i].includes(1)) {
+//     //     rowToAddTo = i;
+//     //     break;
+//     //   }
+//     // }
+//     for (let j = 0; j < rows.length; j++) {
+//       solution.togglePiece(rowToAddTo, j);
+//       if (!solution.hasAnyQueensConflicts()) {
+//         queenCount++;
+//         return innerFunc(solution, rowToAddTo + 1);
+//       } else if (solution.hasAnyQueensConflicts() && j === rows.length - 1) {
+//         return 0;
+//       } else {
+//         solution.togglePiece(rowToAddTo, j);
+//       }
+//     }
+//   }
+// };
